@@ -1,0 +1,25 @@
+{
+  "name": "crudnodejs",
+  "version": "1.0.0",
+  "description": "test crud in nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "restful"
+  ],
+  "author": "Anpx",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "moment": "^2.23.0",
+    "mongoose": "^5.4.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.11.1"
+  }
+}
