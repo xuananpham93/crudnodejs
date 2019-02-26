@@ -1,10 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+var cors = require('cors')
 const dbConfig = require('./src/config');
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+app.use(cors())
 
 // Configure bodyparser to handle post requests
 app.use(bodyParser.urlencoded({

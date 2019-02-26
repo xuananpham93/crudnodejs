@@ -14,7 +14,7 @@ exports.findAllNotes = async (req, res) => {
             utils.send_error_500(res, err);
         });
 
-    utils.calc_test();
+    // utils.calc_test();
     console.log(3);
     utils.sendData(res, notes, 'Success');
 };
