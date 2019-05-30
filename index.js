@@ -26,7 +26,7 @@ mongoose.connect(dbConfig.database, {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send('Hello');
 });
 
 // Creates the endpoint for our webhook 
