@@ -3,10 +3,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const request = require('request');
 var cors = require('cors');
-app.use(express.static('public'));
 const dbConfig = require('./src/config');
 
 const app = express();
+
+app.use(express.static('public'));
 const port = process.env.PORT || 5000;
 const PAGE_ACCESS_TOKEN = 'EAAgC92X2sWYBAOd7bZBFCKHifsZBAjrkP7zTg1GWiblgXPdh1VHHZCnF4bvFdDEQ5rOhirorlNXPYv1bTESc1WaVxdBq73U9nowzNjF1AlZAW79Jr43yBjJOvTxfisO5gRJ49wFnjBP6Ia5LZAobccb5nylIppGAD75SB5TShxFJHVx8b9tGN';
 
