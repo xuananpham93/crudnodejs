@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const request = require('request');
 var cors = require('cors');
+app.use(express.static('public'));
 const dbConfig = require('./src/config');
 
 const app = express();
@@ -27,7 +28,31 @@ mongoose.connect(dbConfig.database, {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello');
+    res.send('Hello World');
+});
+
+// Serve the options path and set required headers
+app.get('/options', (req, res, next) => {
+    let referer = req.get('Referer');
+    if (referer) {
+        if (referer.indexOf('www.messenger.com') >= 0) {
+            res.setHeader('X-Frame-Options', 'ALLOW-FROM https://www.messenger.com/');
+        } else if (referer.indexOf('www.facebook.com') >= 0) {
+            res.setHeader('X-Frame-Options', 'ALLOW-FROM https://www.facebook.com/');
+        }
+        res.sendFile('public/options.html', { root: __dirname });
+    }
+});
+
+// Handle postback from webview
+app.get('/optionspostback', (req, res) => {
+    let body = req.query;
+    let response = {
+        'text': `Great, I will book you a ${body.bed} bed, with ${body.pillows} pillows and a ${body.view} view.`
+    };
+
+    res.status(200).send('Please close this window to return to the conversation thread.');
+    callSendAPI(body.psid, response);
 });
 
 // Creates the endpoint for our webhook 
@@ -102,26 +127,51 @@ app.listen(port, () => {
     console.log('Start app ' + port);
 });
 
+// Define the template and webview
+function setRoomPreferences(sender_psid) {
+    let response = {
+        attachment: {
+            type: 'template',
+            payload: {
+                template_type: 'button',
+                text: 'OK, let\'s set your room preferences so I won\'t need to ask for them in the future.',
+                buttons: [{
+                    type: 'web_url',
+                    url: 'https://crudnodejs-hitex.herokuapp.com/' + '/options',
+                    title: 'Set preferences',
+                    webview_height_ratio: 'compact',
+                    messenger_extensions: true
+                }]
+            }
+        }
+    };
+
+    return response;
+}
+
 // Handles messages events
 function handleMessage(sender_psid, received_message) {
     let response;
 
     // Checks if the message contains text
     if (received_message.text) {
-
-        // Creates the payload for a basic text message, which
-        // will be added to the body of our request to the Send API
+        switch (received_message.text.replace(/[^\w\s]/gi, '').trim().toLowerCase()) {
+            case 'room preferences':
+                response = setRoomPreferences(sender_psid);
+                break;
+            default:
+                response = {
+                    'text': `You sent the message: '${received_message.text}'.`
+                };
+                break;
+        }
+    } else {
         response = {
-            'text': `You sent the message: '${received_message.text}'. Now send me an attachment!`
+            'text': 'Sorry, I don\'t understand what you mean.'
         };
-
-    } else if (received_message.attachments) {
-        // Gets the URL of the message attachment
-        let attachment_url = received_message.attachments[0].payload.url;
-        console.log('attachment_url', attachment_url);
     }
 
-    // Sends the response message
+    // Send the response message
     callSendAPI(sender_psid, response);
 }
 
